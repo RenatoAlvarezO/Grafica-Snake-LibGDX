@@ -1,11 +1,12 @@
 package elc102.ficct;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -21,18 +22,14 @@ import elc102.ficct.utils.Obstacle;
 import elc102.ficct.utils.Snake;
 import elc102.ficct.utils.TimeCounter;
 
-public class Game extends ApplicationAdapter {
+public class Game extends ApplicationAdapter implements InputProcessor {
   SpriteBatch batch;
   Texture gameOverTexture;
   Grid grid;
 
-  List<Food> foodList;
-  List<Obstacle> obstacleList;
-
   Snake snake;
   int counter = 0;
 
-  InputController inputController;
   CollitionController collitionController;
   TimeCounter gameSpeed;
 
@@ -46,28 +43,23 @@ public class Game extends ApplicationAdapter {
 
     grid = new Grid(16 * 2, 9 * 2);
 
-    foodList = new LinkedList<>();
-    obstacleList = new LinkedList<>();
+    grid.addToGrid(2, 3, Grid.FOOD);
 
-    foodList.add(new Food(0, 0));
-
-    obstacleList.add(new Obstacle(17, 10));
-    obstacleList.add(new Obstacle(18, 10));
-    obstacleList.add(new Obstacle(19, 10));
+    grid.addToGrid(2, 3, Grid.FOOD);
+    grid.addToGrid(3, 12, Grid.FOOD);
+    grid.addToGrid(23, 13, Grid.OBSTACLE);
 
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
 
-    inputController = new InputController(snake);
-    inputController.start();
     gameSpeed = new TimeCounter(50);
-
-    collitionController = new CollitionController(snake, foodList, obstacleList);
 
     score = 0;
     gameState = true;
 
     gameOverTexture = new Texture("game_over.png");
     scoreFont = new BitmapFont();
+
+    Gdx.input.setInputProcessor(this);
   }
 
   @Override
@@ -75,34 +67,31 @@ public class Game extends ApplicationAdapter {
 
     ScreenUtils.clear(Color.TEAL);
 
-    if (collitionController.foodCollitions()) {
-      addNewFood(foodList, obstacleList, grid);
-      score++;
-    }
+    // if (collitionController.foodCollitions()) {
+    // score++;
+    // }
 
-    if (collitionController.obstacleCollition() || collitionController.snakeSelfCollition()) {
-      inputController.stop();
-      gameSpeed.stop();
-      gameState = false;
-    }
+    // if (collitionController.obstacleCollition() ||
+    // collitionController.snakeSelfCollition()) {
+    // gameSpeed.stop();
+    // gameState = false;
+    // }
+
     if (gameSpeed.hasPassed()) {
       snake.updatePosition();
+      // System.out.print(snake.currentDirection + "\t =>\t");
+      // System.out.println(snake.xHeadPosition + " : " + snake.yHeadPosition);
       gameSpeed.reset();
     }
 
     batch.begin();
 
-    snake.draw(batch);
-    for (Food food : foodList)
-      food.draw(batch, grid);
-
-    for (Obstacle obstacle : obstacleList)
-      obstacle.draw(batch, grid);
     scoreFont.draw(batch, String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
 
-    if (!gameState) {
+    if (!gameState)
       batch.draw(gameOverTexture, Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() / 2 - 150, 500, 300);
-    }
+
+    grid.render(batch);
     batch.end();
   }
 
@@ -125,7 +114,6 @@ public class Game extends ApplicationAdapter {
 
       foodList.add(new Food(xRandom, yRandom));
     } while (contains(xRandom, yRandom, obstacleList));
-    System.out.println("( " + xRandom + " , " + yRandom + " )");
   }
 
   private boolean contains(int x, int y, List<Obstacle> objectList) {
@@ -133,6 +121,57 @@ public class Game extends ApplicationAdapter {
     for (AObject aObject : objectList)
       if (x == aObject.getxGridPosition() && y == aObject.getyGridPosition())
         return true;
+    return false;
+  }
+
+  @Override
+  public boolean keyDown(int keycode) {
+
+    int currentDirection = 0;
+    if (keycode == (Input.Keys.W))
+      currentDirection = InputController.UP;
+    if (keycode == (Input.Keys.S))
+      currentDirection = InputController.DOWN;
+    if (keycode == (Input.Keys.D))
+      currentDirection = InputController.RIGHT;
+    if (keycode == (Input.Keys.A))
+      currentDirection = InputController.LEFT;
+    snake.setCurrentDirection(currentDirection);
+    return true;
+  }
+
+  @Override
+  public boolean keyUp(int keycode) {
+    return false;
+  }
+
+  @Override
+  public boolean keyTyped(char character) {
+    return false;
+  }
+
+  @Override
+  public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    return false;
+  }
+
+  @Override
+  public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+    return false;
+  }
+
+  @Override
+  public boolean touchDragged(int screenX, int screenY, int pointer) {
+    return false;
+  }
+
+  @Override
+  public boolean mouseMoved(int screenX, int screenY) {
+    return false;
+  }
+
+  @Override
+  public boolean scrolled(float amountX, float amountY) {
     return false;
   }
 }

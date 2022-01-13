@@ -11,95 +11,202 @@ import elc102.ficct.props.Grid;
 
 public class Snake {
 
-  List<SnakePart> snakeBodyList;
+  public static final int RIGHT = 0;
+  public static final int DOWN = 1;
+  public static final int LEFT = 2;
+  public static final int UP = 3;
 
-  int currentDirection = 0;
+  public int currentDirection = RIGHT;
+  public int tailDirection = RIGHT;
 
+  public int tailAvoidDirection = LEFT;
   Grid grid;
 
+  public int xHeadPosition;
+  public int yHeadPosition;
+  public int xTailPosition;
+  public int yTailPosition;
+
   public Snake(int xGridPosition, int yGridPosition, Grid grid) {
-    this.snakeBodyList = new LinkedList<>();
-    this.snakeBodyList.add(new SnakePart(xGridPosition, yGridPosition));
+    this.xHeadPosition = xGridPosition;
+    this.yHeadPosition = yGridPosition;
+
+    this.xTailPosition = xHeadPosition - 1;
+    this.yTailPosition = yHeadPosition;
+
     this.grid = grid;
+    grid.addToGrid(xHeadPosition, yHeadPosition, Grid.HEAD);
+    grid.addToGrid(xTailPosition, yTailPosition, Grid.BODY);
   }
 
-  public void addToGridPosition(int x, int y) {
+  public boolean addToGridPosition(int x, int y) {
 
-    SnakePart snakeHead = this.snakeBodyList.get(0);
+    if (grid.isOutOfBounds(this.xHeadPosition + x, this.yHeadPosition + y))
+      return false;
+    // x = ();
+    // y = ();
 
-    x = (snakeHead.getxGridPosition() + x);
-    y = (snakeHead.getyGridPosition() + y);
+    grid.addToGrid(this.xHeadPosition, this.yHeadPosition, Grid.BODY);
+    this.xHeadPosition += x;
+    this.yHeadPosition += y;
 
-    this.updateBody(x, y);
+    // System.out.print(grid.matrixGrid.length);
+    // System.out.print(" : ");
+    // System.out.print(grid.matrixGrid[0].length);
+    // System.out.print(" => ");
+    // System.out.print(xHeadPosition);
+    // System.out.print(" : ");
+    // System.out.println(yHeadPosition);
+
+    return true;
   }
 
-  private void updateBody(int x, int y) {
-    SnakePart snakeHead = this.snakeBodyList.get(0);
+  private void findNextTailPosition() {
 
-    for (int index = this.snakeBodyList.size() - 1; index > 0; index--) {
-      SnakePart currentPart = this.snakeBodyList.get(index);
-      SnakePart nextPart = this.snakeBodyList.get(index - 1);
-
-      currentPart.setGridPosition(nextPart.getxGridPosition(), nextPart.getyGridPosition());
+    if (tailDirection == RIGHT) {
+      if (testRight())
+        return;
+      if (testUp())
+        return;
+      if (testDown())
+        return;
     }
-    snakeHead.setGridPosition(x, y);
+    if (tailDirection == UP) {
+      if (testUp())
+        return;
+      if (testLeft())
+        return;
+      if (testRight())
+        return;
+    }
+    if (tailDirection == LEFT) {
+      if (testLeft())
+        return;
+      if (testDown())
+        return;
+      if (testUp())
+        return;
+    }
+
+    if (tailDirection == DOWN) {
+      if (testDown())
+        return;
+      if (testRight())
+        return;
+      if (testLeft())
+        return;
+    }
+
+    try {
+      throw new Exception("Tail cannot find new position \n\tCurrent Direction=> " + String.valueOf(currentDirection)
+          + "\n\tTail's Direction=> " + String.valueOf(tailDirection) + "\n\tCurrent Position=> "
+          + String.valueOf(xTailPosition) + " : " + String.valueOf(yTailPosition));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
-  public void draw(SpriteBatch batch) {
-    for (SnakePart snakePart : snakeBodyList)
-      snakePart.draw(batch, grid);
+  private boolean testRight() {
+    int testPosition = findRight();
+    if (testPosition >= 0) {
+      xTailPosition = testPosition;
+      tailDirection = RIGHT;
+      return true;
+    }
+    return false;
   }
 
-  public SnakePart getSnakeHead() {
-    return this.snakeBodyList.get(0);
+  private boolean testUp() {
+    int testPosition = findUp();
+    if (testPosition >= 0) {
+      yTailPosition = testPosition;
+      tailDirection = UP;
+      return true;
+    }
+    return false;
   }
 
-  public void addToTail() {
-    SnakePart currentTail = this.snakeBodyList.get(this.snakeBodyList.size() - 1);
+  private boolean testLeft() {
+    int testPosition = findLeft();
+    if (testPosition >= 0) {
+      xTailPosition = testPosition;
+      tailDirection = LEFT;
+      return true;
+    }
+    return false;
+  }
 
-    if (currentDirection == InputController.UP)
-      this.snakeBodyList.add(
-          new SnakePart(new Texture("body.png"), currentTail.getxGridPosition(), currentTail.getyGridPosition() - 1));
-    if (currentDirection == InputController.DOWN)
-      this.snakeBodyList.add(
-          new SnakePart(new Texture("body.png"), currentTail.getxGridPosition(), currentTail.getyGridPosition() + 1));
-    if (currentDirection == InputController.LEFT)
-      this.snakeBodyList.add(
-          new SnakePart(new Texture("body.png"), currentTail.getxGridPosition() + 1, currentTail.getyGridPosition()));
-    if (currentDirection == InputController.RIGHT)
-      this.snakeBodyList.add(
-          new SnakePart(new Texture("body.png"), currentTail.getxGridPosition() - 1, currentTail.getyGridPosition()));
+  private boolean testDown() {
+    int testPosition = findDown();
+    if (testPosition >= 0) {
+      yTailPosition = testPosition;
+      tailDirection = DOWN;
+      return true;
+    }
+    return false;
+  }
 
+  private int findRight() {
+    int testPosition = xTailPosition + 1;
+    if (grid.isxOutOfBounds(testPosition))
+      testPosition = 0;
+    return grid.getCellValue(testPosition, yTailPosition) >= 3 ? testPosition : -1;
+  }
+
+  private int findLeft() {
+    int testPosition = xTailPosition - 1;
+    if (grid.isxOutOfBounds(testPosition))
+      testPosition = grid.getColumnCount() - 1;
+    return grid.getCellValue(testPosition, yTailPosition) >= 3 ? testPosition : -1;
+  }
+
+  private int findUp() {
+    int testPosition = yTailPosition + 1;
+    if (grid.isyOutOfBounds(testPosition))
+      testPosition = 0;
+    return grid.getCellValue(xTailPosition, testPosition) >= 3 ? testPosition : -1;
+  }
+
+  private int findDown() {
+    int testPosition = yTailPosition - 1;
+    if (grid.isyOutOfBounds(testPosition))
+      testPosition = grid.getRowCount() - 1;
+    return grid.getCellValue(xTailPosition, testPosition) >= 3 ? testPosition : -1;
   }
 
   public void updatePosition() {
 
-    SnakePart snakeHead = snakeBodyList.get(0);
     if (currentDirection == InputController.UP) {
-      this.addToGridPosition(0, 1);
-      if (snakeHead.getyGridPosition() > grid.getRowCount() - 1)
-        snakeHead.setyGridPosition(0);
+      if (yHeadPosition > grid.getRowCount() - 1 || !this.addToGridPosition(0, 1))
+        yHeadPosition = (0);
+      updateBody();
       return;
     }
     if (currentDirection == InputController.DOWN) {
-      this.addToGridPosition(0, -1);
-      if (snakeHead.getyGridPosition() < 0)
-        snakeHead.setyGridPosition(grid.getRowCount() - 1);
+      if (yHeadPosition < 0 || !this.addToGridPosition(0, -1))
+        yHeadPosition = (grid.getRowCount() - 1);
+      updateBody();
       return;
     }
     if (currentDirection == InputController.LEFT) {
-      this.addToGridPosition(-1, 0);
-      if (snakeHead.getxGridPosition() < 0)
-        snakeHead.setxGridPosition(grid.getColumnCount() - 1);
+      if (xHeadPosition < 0 || !this.addToGridPosition(-1, 0))
+        xHeadPosition = (grid.getColumnCount() - 1);
+      updateBody();
       return;
     }
     if (currentDirection == InputController.RIGHT) {
-      this.addToGridPosition(1, 0);
-      if (snakeHead.getxGridPosition() > grid.getColumnCount() - 1)
-        snakeHead.setxGridPosition(0);
-      return;
+      if (xHeadPosition > grid.getColumnCount() - 1 || !this.addToGridPosition(1, 0))
+        xHeadPosition = (0);
+      updateBody();
     }
 
+  }
+
+  void updateBody() {
+    grid.addToGrid(this.xHeadPosition, this.yHeadPosition, Grid.HEAD);
+    grid.addToGrid(this.xTailPosition, this.yTailPosition, Grid.EMPTY);
+    findNextTailPosition();
+    grid.addToGrid(this.xTailPosition, this.yTailPosition, Grid.BODY);
   }
 
   public void setCurrentDirection(int newDirection) {
@@ -115,7 +222,4 @@ public class Snake {
 
   }
 
-  public List<SnakePart> getSnakeBody() {
-    return this.snakeBodyList;
-  }
 }
