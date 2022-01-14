@@ -6,7 +6,6 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import elc102.ficct.controllers.InputController;
 import elc102.ficct.props.Grid;
 
 public class Snake {
@@ -22,178 +21,175 @@ public class Snake {
   public int tailAvoidDirection = LEFT;
   Grid grid;
 
-  public int xHeadPosition;
-  public int yHeadPosition;
-  public int xTailPosition;
-  public int yTailPosition;
+  private Coordinates headPosition;
+  private Coordinates tailPosition;
 
   public Snake(int xGridPosition, int yGridPosition, Grid grid) {
-    this.xHeadPosition = xGridPosition;
-    this.yHeadPosition = yGridPosition;
 
-    this.xTailPosition = xHeadPosition - 1;
-    this.yTailPosition = yHeadPosition;
+    this.headPosition = new Coordinates(xGridPosition, yGridPosition);
+    this.tailPosition = new Coordinates(xGridPosition - 1, yGridPosition);
 
     this.grid = grid;
-    grid.addToGrid(xHeadPosition, yHeadPosition, Grid.HEAD);
-    grid.addToGrid(xTailPosition, yTailPosition, Grid.BODY);
+    grid.addToGrid(headPosition.x, headPosition.y, Grid.HEAD);
+    grid.addToGrid(tailPosition.x, tailPosition.y, Grid.BODY);
   }
 
   public boolean addToGridPosition(int x, int y) {
 
-    if (grid.isOutOfBounds(this.xHeadPosition + x, this.yHeadPosition + y))
+    if (grid.isOutOfBounds(this.headPosition.x + x, this.headPosition.y + y))
       return false;
 
-    grid.addToGrid(this.xHeadPosition, this.yHeadPosition, Grid.BODY);
-    this.xHeadPosition += x;
-    this.yHeadPosition += y;
+    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.BODY);
+    this.headPosition.x += x;
+    this.headPosition.y += y;
 
     return true;
   }
 
   private void findNextTailPosition() {
     if (tailDirection == RIGHT) {
-      if (testRight())
+      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
         return;
-      if (testUp())
+      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
         return;
-      if (testDown())
+      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
         return;
     }
     if (tailDirection == UP) {
-      if (testUp())
+      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
         return;
-      if (testLeft())
+      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
         return;
-      if (testRight())
+      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
         return;
     }
     if (tailDirection == LEFT) {
-      if (testLeft())
+      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
         return;
-      if (testDown())
+      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
         return;
-      if (testUp())
+      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
         return;
     }
 
     if (tailDirection == DOWN) {
-      if (testDown())
+      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
         return;
-      if (testRight())
+      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
         return;
-      if (testLeft())
+      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
         return;
     }
 
     try {
       throw new Exception("Tail cannot find new position \n\tCurrent Direction=> " + String.valueOf(currentDirection)
           + "\n\tTail's Direction=> " + String.valueOf(tailDirection) + "\n\tCurrent Position=> "
-          + String.valueOf(xTailPosition) + " : " + String.valueOf(yTailPosition));
+          + String.valueOf(tailPosition.x) + " : " + String.valueOf(tailPosition.y));
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  private boolean testRight() {
-    int testPosition = findRight();
-    if (testPosition >= 0) {
-      xTailPosition = testPosition;
+  private boolean testRight(Coordinates testPosition, int value) {
+
+    int newPosition = findRight(testPosition, value);
+    if (newPosition >= 0) {
+      tailPosition.x = newPosition;
       tailDirection = RIGHT;
       return true;
     }
     return false;
   }
 
-  private boolean testUp() {
-    int testPosition = findUp();
-    if (testPosition >= 0) {
-      yTailPosition = testPosition;
+  private boolean testUp(Coordinates testPosition, int value) {
+    int newPosition = findUp(testPosition, value);
+    if (newPosition >= 0) {
+      tailPosition.y = newPosition;
       tailDirection = UP;
       return true;
     }
     return false;
   }
 
-  private boolean testLeft() {
-    int testPosition = findLeft();
-    if (testPosition >= 0) {
-      xTailPosition = testPosition;
+  private boolean testLeft(Coordinates testPosition, int value) {
+    int newPosition = findLeft(testPosition, value);
+    if (newPosition >= 0) {
+      tailPosition.x = newPosition;
       tailDirection = LEFT;
       return true;
     }
     return false;
   }
 
-  private boolean testDown() {
-    int testPosition = findDown();
-    if (testPosition >= 0) {
-      yTailPosition = testPosition;
+  private boolean testDown(Coordinates testPosition, int value) {
+    int newPosition = findDown(testPosition, value);
+    if (newPosition >= 0) {
+      tailPosition.y = newPosition;
       tailDirection = DOWN;
       return true;
     }
     return false;
   }
 
-  private int findRight() {
-    int testPosition = xTailPosition + 1;
-    if (grid.isxOutOfBounds(testPosition))
-      testPosition = 0;
-    return grid.getCellValue(testPosition, yTailPosition) >= 3 ? testPosition : -1;
+  private int findRight(Coordinates testPosition, int value) {
+    int newPosition = testPosition.x + 1;
+    if (grid.isxOutOfBounds(newPosition))
+      newPosition = 0;
+    return grid.getCellValue(newPosition, testPosition.y) == value ? newPosition : -1;
   }
 
-  private int findLeft() {
-    int testPosition = xTailPosition - 1;
-    if (grid.isxOutOfBounds(testPosition))
-      testPosition = grid.getColumnCount() - 1;
-    return grid.getCellValue(testPosition, yTailPosition) >= 3 ? testPosition : -1;
+  private int findLeft(Coordinates testPosition, int value) {
+    int newPosition = testPosition.x - 1;
+    if (grid.isxOutOfBounds(newPosition))
+      newPosition = grid.getColumnCount() - 1;
+    return grid.getCellValue(newPosition, testPosition.y) == value ? newPosition : -1;
   }
 
-  private int findUp() {
-    int testPosition = yTailPosition + 1;
-    if (grid.isyOutOfBounds(testPosition))
-      testPosition = 0;
-    return grid.getCellValue(xTailPosition, testPosition) >= 3 ? testPosition : -1;
+  private int findUp(Coordinates testPosition, int value) {
+    int newPosition = testPosition.y + 1;
+    if (grid.isyOutOfBounds(newPosition))
+      newPosition = 0;
+    return grid.getCellValue(testPosition.x, newPosition) == value ? newPosition : -1;
   }
 
-  private int findDown() {
-    int testPosition = yTailPosition - 1;
-    if (grid.isyOutOfBounds(testPosition))
-      testPosition = grid.getRowCount() - 1;
-    return grid.getCellValue(xTailPosition, testPosition) >= 3 ? testPosition : -1;
+  private int findDown(Coordinates testPosition, int value) {
+    int newPosition = testPosition.y - 1;
+    if (grid.isyOutOfBounds(newPosition))
+      newPosition = grid.getRowCount() - 1;
+    return grid.getCellValue(testPosition.x, newPosition) == value ? newPosition : -1;
   }
 
   public void updatePosition() {
-    if (currentDirection == InputController.UP) {
-      if (yHeadPosition > grid.getRowCount() - 1 || !this.addToGridPosition(0, 1))
-        yHeadPosition = (0);
+    if (currentDirection == UP) {
+      if (headPosition.y > grid.getRowCount() - 1 || !this.addToGridPosition(0, 1))
+        headPosition.y = (0);
       updateBody();
       return;
     }
-    if (currentDirection == InputController.DOWN) {
-      if (yHeadPosition < 0 || !this.addToGridPosition(0, -1))
-        yHeadPosition = (grid.getRowCount() - 1);
+    if (currentDirection == DOWN) {
+      if (headPosition.y < 0 || !this.addToGridPosition(0, -1))
+        headPosition.y = (grid.getRowCount() - 1);
       updateBody();
       return;
     }
-    if (currentDirection == InputController.LEFT) {
-      if (xHeadPosition < 0 || !this.addToGridPosition(-1, 0))
-        xHeadPosition = (grid.getColumnCount() - 1);
+    if (currentDirection == LEFT) {
+      if (headPosition.x < 0 || !this.addToGridPosition(-1, 0))
+        headPosition.x = (grid.getColumnCount() - 1);
       updateBody();
       return;
     }
-    if (currentDirection == InputController.RIGHT) {
-      if (xHeadPosition > grid.getColumnCount() - 1 || !this.addToGridPosition(1, 0))
-        xHeadPosition = (0);
+    if (currentDirection == RIGHT) {
+      if (headPosition.x > grid.getColumnCount() - 1 || !this.addToGridPosition(1, 0))
+        headPosition.x = (0);
       updateBody();
     }
   }
 
   void updateBody() {
-    grid.addToGrid(this.xHeadPosition, this.yHeadPosition, Grid.HEAD);
-    grid.addToGrid(this.xTailPosition, this.yTailPosition, Grid.EMPTY);
+    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
     findNextTailPosition();
-    grid.addToGrid(this.xTailPosition, this.yTailPosition, Grid.BODY);
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
   }
 
   public void setCurrentDirection(int newDirection) {
@@ -202,11 +198,10 @@ public class Snake {
   }
 
   public boolean validateDirection(int newDirection) {
-    return !(currentDirection == InputController.UP && newDirection == InputController.DOWN) &&
-        !(currentDirection == InputController.DOWN && newDirection == InputController.UP) &&
-        !(currentDirection == InputController.RIGHT && newDirection == InputController.LEFT) &&
-        !(currentDirection == InputController.LEFT && newDirection == InputController.RIGHT);
-
+    return !(currentDirection == UP && newDirection == DOWN) &&
+        !(currentDirection == DOWN && newDirection == UP) &&
+        !(currentDirection == RIGHT && newDirection == LEFT) &&
+        !(currentDirection == LEFT && newDirection == RIGHT);
   }
 
 }

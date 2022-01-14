@@ -134,11 +134,11 @@ public class Game extends ApplicationAdapter implements InputProcessor, Collitio
     int currentDirection = 0;
     if (keycode == (Input.Keys.W))
       currentDirection = InputController.UP;
-    if (keycode == (Input.Keys.S))
+    else if (keycode == (Input.Keys.S))
       currentDirection = InputController.DOWN;
-    if (keycode == (Input.Keys.D))
+    else if (keycode == (Input.Keys.D))
       currentDirection = InputController.RIGHT;
-    if (keycode == (Input.Keys.A))
+    else if (keycode == (Input.Keys.A))
       currentDirection = InputController.LEFT;
     snake.setCurrentDirection(currentDirection);
     return true;
