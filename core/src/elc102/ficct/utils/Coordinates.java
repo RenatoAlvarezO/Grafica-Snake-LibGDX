@@ -8,5 +8,24 @@ public class Coordinates {
   public Coordinates(int x, int y) {
     this.x = x;
     this.y = y;
+
   }
+
+  // THIS CONSTRUCTOR COPIES!
+  public Coordinates(Coordinates coordinates) {
+    this.x = coordinates.x;
+    this.y = coordinates.y;
+  }
+
+  public void setCoordinates(int x, int y) {
+    this.x = x;
+    this.y = y;
+
+  }
+
+  @Override
+  public String toString() {
+    return "(" + String.valueOf(x) + "," + String.valueOf(y) + ")";
+  }
+
 }

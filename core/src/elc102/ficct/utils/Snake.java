@@ -2,6 +2,7 @@ package elc102.ficct.utils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,10 +25,17 @@ public class Snake {
   private Coordinates headPosition;
   private Coordinates tailPosition;
 
+  List<Coordinates> snakePath;
+
   public Snake(int xGridPosition, int yGridPosition, Grid grid) {
 
     this.headPosition = new Coordinates(xGridPosition, yGridPosition);
     this.tailPosition = new Coordinates(xGridPosition - 1, yGridPosition);
+
+    this.snakePath = new LinkedList<Coordinates>();
+
+    this.snakePath.add(headPosition);
+    this.snakePath.add(tailPosition);
 
     this.grid = grid;
     grid.addToGrid(headPosition.x, headPosition.y, Grid.HEAD);
@@ -39,11 +47,44 @@ public class Snake {
     if (grid.isOutOfBounds(this.headPosition.x + x, this.headPosition.y + y))
       return false;
 
+    // addToHead();
     grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.BODY);
     this.headPosition.x += x;
     this.headPosition.y += y;
 
     return true;
+  }
+
+  public void addToTail(int x, int y) {
+    Coordinates previousTail = new Coordinates(this.tailPosition);
+    this.tailPosition.setCoordinates(x, y);
+    int previousTailIndex = snakePath.size() - 2;
+    snakePath.add(previousTailIndex, previousTail);
+  }
+
+  public void addToHead() {
+    Coordinates previousHead = new Coordinates(headPosition);
+    snakePath.add(1, previousHead);
+    System.out.println(snakePath.size());
+  }
+
+  public void updateBody() {
+    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
+    findNextTailPosition();
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
+  }
+
+  public void setCurrentDirection(int newDirection) {
+    if (validateDirection(newDirection))
+      this.currentDirection = newDirection;
+  }
+
+  public boolean validateDirection(int newDirection) {
+    return !(currentDirection == UP && newDirection == DOWN) &&
+        !(currentDirection == DOWN && newDirection == UP) &&
+        !(currentDirection == RIGHT && newDirection == LEFT) &&
+        !(currentDirection == LEFT && newDirection == RIGHT);
   }
 
   private void findNextTailPosition() {
@@ -183,25 +224,8 @@ public class Snake {
         headPosition.x = (0);
       updateBody();
     }
-  }
-
-  void updateBody() {
-    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
-    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
-    findNextTailPosition();
-    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
-  }
-
-  public void setCurrentDirection(int newDirection) {
-    if (validateDirection(newDirection))
-      this.currentDirection = newDirection;
-  }
-
-  public boolean validateDirection(int newDirection) {
-    return !(currentDirection == UP && newDirection == DOWN) &&
-        !(currentDirection == DOWN && newDirection == UP) &&
-        !(currentDirection == RIGHT && newDirection == LEFT) &&
-        !(currentDirection == LEFT && newDirection == RIGHT);
+    
+    System.out.println(snakePath);
   }
 
 }
