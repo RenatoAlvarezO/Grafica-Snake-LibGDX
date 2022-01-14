@@ -43,26 +43,15 @@ public class Snake {
 
     if (grid.isOutOfBounds(this.xHeadPosition + x, this.yHeadPosition + y))
       return false;
-    // x = ();
-    // y = ();
 
     grid.addToGrid(this.xHeadPosition, this.yHeadPosition, Grid.BODY);
     this.xHeadPosition += x;
     this.yHeadPosition += y;
 
-    // System.out.print(grid.matrixGrid.length);
-    // System.out.print(" : ");
-    // System.out.print(grid.matrixGrid[0].length);
-    // System.out.print(" => ");
-    // System.out.print(xHeadPosition);
-    // System.out.print(" : ");
-    // System.out.println(yHeadPosition);
-
     return true;
   }
 
   private void findNextTailPosition() {
-
     if (tailDirection == RIGHT) {
       if (testRight())
         return;
@@ -175,7 +164,6 @@ public class Snake {
   }
 
   public void updatePosition() {
-
     if (currentDirection == InputController.UP) {
       if (yHeadPosition > grid.getRowCount() - 1 || !this.addToGridPosition(0, 1))
         yHeadPosition = (0);
@@ -199,7 +187,6 @@ public class Snake {
         xHeadPosition = (0);
       updateBody();
     }
-
   }
 
   void updateBody() {

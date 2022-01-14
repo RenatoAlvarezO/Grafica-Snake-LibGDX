@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import elc102.ficct.controllers.CollitionController;
+import elc102.ficct.controllers.CollitionController.CollitionProcessor;
 import elc102.ficct.controllers.InputController;
 import elc102.ficct.props.Grid;
 import elc102.ficct.utils.AObject;
@@ -22,7 +23,7 @@ import elc102.ficct.utils.Obstacle;
 import elc102.ficct.utils.Snake;
 import elc102.ficct.utils.TimeCounter;
 
-public class Game extends ApplicationAdapter implements InputProcessor {
+public class Game extends ApplicationAdapter implements InputProcessor, CollitionProcessor {
   SpriteBatch batch;
   Texture gameOverTexture;
   Grid grid;
@@ -60,6 +61,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     scoreFont = new BitmapFont();
 
     Gdx.input.setInputProcessor(this);
+    collitionController = new CollitionController();
+    collitionController.initialize(this);
+
   }
 
   @Override
@@ -173,5 +177,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
   @Override
   public boolean scrolled(float amountX, float amountY) {
     return false;
+  }
+
+  @Override
+  public void onCollition(String event) {
+    System.out.println("El evento ocurrio a las => " + event);
   }
 }
