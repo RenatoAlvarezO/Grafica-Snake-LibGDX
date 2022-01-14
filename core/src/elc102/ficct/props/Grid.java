@@ -78,7 +78,11 @@ public class Grid {
     return cellHeight * y;
   }
 
-  public int getCellValue(int x, int y){
+  public int getCellValue(int x, int y) {
+    if (isxOutOfBounds(x))
+      x = x < 0 ? this.columnCount - 1 : 0;
+    if (isyOutOfBounds(y))
+      y = y < 0 ? this.rowCount - 1 : 0;
     return this.matrixGrid[x][y];
   }
 

@@ -80,6 +80,18 @@ public class Snake {
       this.currentDirection = newDirection;
   }
 
+  public Coordinates getHeadPosition() {
+    return headPosition;
+  }
+
+  public Coordinates getTailPosition() {
+    return tailPosition;
+  }
+
+  public int getDirection() {
+    return this.currentDirection;
+  }
+
   public boolean validateDirection(int newDirection) {
     return !(currentDirection == UP && newDirection == DOWN) &&
         !(currentDirection == DOWN && newDirection == UP) &&
@@ -224,7 +236,20 @@ public class Snake {
         headPosition.x = (0);
       updateBody();
     }
-    
+
+  }
+
+  public void grow() {
+
+    if (currentDirection == RIGHT)
+      addToTail(tailPosition.x - 1, tailPosition.y);
+    if (currentDirection == UP)
+      addToTail(tailPosition.x, tailPosition.y - 1);
+    if (currentDirection == LEFT)
+      addToTail(tailPosition.x + 1, tailPosition.y);
+    if (currentDirection == DOWN)
+      addToTail(tailPosition.x, tailPosition.y + 1);
+
     System.out.println(snakePath);
   }
 

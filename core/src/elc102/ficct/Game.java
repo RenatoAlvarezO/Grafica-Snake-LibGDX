@@ -26,9 +26,9 @@ import elc102.ficct.utils.TimeCounter;
 public class Game extends ApplicationAdapter implements InputProcessor, GameProcessor {
   SpriteBatch batch;
   Texture gameOverTexture;
-  Grid grid;
+  public Grid grid;
 
-  Snake snake;
+  public Snake snake;
   int counter = 0;
 
   GameController gameController;
@@ -48,6 +48,8 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     grid.addToGrid(2, 3, Grid.FOOD);
     grid.addToGrid(3, 12, Grid.FOOD);
+    grid.addToGrid(21, 6, Grid.FOOD);
+    grid.addToGrid(22, 7, Grid.FOOD);
     grid.addToGrid(23, 13, Grid.OBSTACLE);
 
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
@@ -118,13 +120,13 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     int currentDirection = 0;
     if (keycode == (Input.Keys.W))
-      currentDirection = InputController.UP;
+      currentDirection = Snake.UP;
     else if (keycode == (Input.Keys.S))
-      currentDirection = InputController.DOWN;
+      currentDirection = Snake.DOWN;
     else if (keycode == (Input.Keys.D))
-      currentDirection = InputController.RIGHT;
+      currentDirection = Snake.RIGHT;
     else if (keycode == (Input.Keys.A))
-      currentDirection = InputController.LEFT;
+      currentDirection = Snake.LEFT;
     snake.setCurrentDirection(currentDirection);
     return true;
   }
@@ -167,7 +169,12 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   // GameController
   @Override
   public void onCollition(String event) {
-    // System.out.println("El evento ocurrio a las => " + event);
+
+    if (event == "Food")
+      snake.grow();
+    else {
+      gameState = false;
+    }
   }
 
   @Override
