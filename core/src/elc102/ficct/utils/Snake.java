@@ -243,11 +243,11 @@ public class Snake {
 
     if (currentDirection == RIGHT)
       addToTail(tailPosition.x - 1, tailPosition.y);
-    if (currentDirection == UP)
+    else if (currentDirection == UP)
       addToTail(tailPosition.x, tailPosition.y - 1);
-    if (currentDirection == LEFT)
+    else if (currentDirection == LEFT)
       addToTail(tailPosition.x + 1, tailPosition.y);
-    if (currentDirection == DOWN)
+    else if (currentDirection == DOWN)
       addToTail(tailPosition.x, tailPosition.y + 1);
 
     System.out.println(snakePath);

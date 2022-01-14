@@ -109,7 +109,7 @@ public class GameController {
       if (cellValue == Grid.FOOD)
         notifyCollition("Food");
       else {
-        isRunning = true;
+        isRunning = false;
         notifyCollition("Death");
       }
     }

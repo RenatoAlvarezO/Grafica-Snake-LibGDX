@@ -98,8 +98,11 @@ public class Grid {
     return isxOutOfBounds(x) || isyOutOfBounds(y);
   }
 
-  public void addToGrid(int column, int row, int type) {
+  public int addToGrid(int column, int row, int type) {
+    
+    int previousValue = matrixGrid[column][row];
     matrixGrid[column][row] = type;
+    return previousValue;
   }
 
   public void render(SpriteBatch batch) {

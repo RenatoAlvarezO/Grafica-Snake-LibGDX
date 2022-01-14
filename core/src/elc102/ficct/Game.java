@@ -38,6 +38,8 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   int score;
   boolean gameState;
 
+  int snakeDirection = Snake.RIGHT;
+
   @Override
   public void create() {
     batch = new SpriteBatch();
@@ -118,16 +120,14 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   @Override
   public boolean keyDown(int keycode) {
 
-    int currentDirection = 0;
     if (keycode == (Input.Keys.W))
-      currentDirection = Snake.UP;
+      snakeDirection = Snake.UP;
     else if (keycode == (Input.Keys.S))
-      currentDirection = Snake.DOWN;
+      snakeDirection = Snake.DOWN;
     else if (keycode == (Input.Keys.D))
-      currentDirection = Snake.RIGHT;
+      snakeDirection = Snake.RIGHT;
     else if (keycode == (Input.Keys.A))
-      currentDirection = Snake.LEFT;
-    snake.setCurrentDirection(currentDirection);
+      snakeDirection = Snake.LEFT;
     return true;
   }
 
@@ -170,15 +170,18 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   @Override
   public void onCollition(String event) {
 
-    if (event == "Food")
+    if (event == "Food") {
       snake.grow();
-    else {
+      score++;
+    } else {
       gameState = false;
+      System.out.println(event);
     }
   }
 
   @Override
   public void updateSnake() {
+    snake.setCurrentDirection(snakeDirection);
     snake.updatePosition();
   }
 }
