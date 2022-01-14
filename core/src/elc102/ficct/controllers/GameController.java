@@ -5,38 +5,41 @@ import java.util.List;
 
 import elc102.ficct.Game;
 
-public class CollitionController {
+public class GameController {
 
   private boolean isRunning = false;
 
-  public interface CollitionProcessor {
+  public interface GameProcessor {
     void onCollition(String event);
+    void updateSnake();
   }
 
-  private final List<CollitionProcessor> listeners = new ArrayList<>();
+  private final List<GameProcessor> listeners = new ArrayList<>();
 
   private void notifyListeners(String event) {
-    for (CollitionProcessor collitionProcessor : listeners)
-      collitionProcessor.onCollition(event);
+    for (GameProcessor gameProcessor : listeners){
+      gameProcessor.onCollition(event);
+      gameProcessor.updateSnake();  
+    }
   }
 
-  public void addListentener(CollitionProcessor listener) {
+  public void addListentener(GameProcessor listener) {
     listeners.add(listener);
   }
 
   public void initialize(Game game) {
     this.isRunning = true;
-   
+
     addListentener(game);
 
     Thread listenerThead = new Thread() {
       long startTime;
-      long updateTime = 100;
+      long updateTime = 50;
       long lastTime = startTime;
 
       @Override
       public void run() {
-        setName("Collition");
+        setName("GameController");
         setPriority(2);
 
         while (isRunning) {
@@ -57,7 +60,11 @@ public class CollitionController {
   void checkForCollitions() {
 
   }
-  // public boolean foodCollitions() {
+
+
+
+  
+  // public boolean foodtarts() {
   // SnakePart snakeHead = snake.getSnakeHead();
   //
   // for (int index = 0; index < foodList.size(); index++) {
@@ -70,7 +77,7 @@ public class CollitionController {
   // return false;
   // }
   //
-  // public boolean obstacleCollition() {
+  // public boolean obstacletart() {
   //
   // SnakePart snakeHead = snake.getSnakeHead();
   //
@@ -80,7 +87,7 @@ public class CollitionController {
   // return false;
   // }
   //
-  // public boolean snakeSelfCollition() {
+  // public boolean snakeSelftart() {
   //
   // SnakePart snakeHead = snake.getSnakeHead();
   // List<SnakePart> snakeBody = snake.getSnakeBody();
