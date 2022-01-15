@@ -1,5 +1,6 @@
 package elc102.ficct;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
@@ -15,13 +16,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import elc102.ficct.controllers.GameController;
 import elc102.ficct.controllers.GameController.GameProcessor;
-import elc102.ficct.controllers.InputController;
 import elc102.ficct.props.Grid;
-import elc102.ficct.utils.AObject;
-import elc102.ficct.utils.Food;
-import elc102.ficct.utils.Obstacle;
 import elc102.ficct.utils.Snake;
-import elc102.ficct.utils.TimeCounter;
 
 public class Game extends ApplicationAdapter implements InputProcessor, GameProcessor {
   SpriteBatch batch;
@@ -32,7 +28,6 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   int counter = 0;
 
   GameController gameController;
-  TimeCounter gameSpeed;
 
   BitmapFont scoreFont;
   int score;
@@ -46,16 +41,12 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     grid = new Grid(16 * 2, 9 * 2);
 
-    grid.addToGrid(2, 3, Grid.FOOD);
-
-    grid.addToGrid(3, 12, Grid.FOOD);
-    grid.addToGrid(21, 6, Grid.FOOD);
-    grid.addToGrid(22, 9, Grid.FOOD);
     grid.addToGrid(23, 13, Grid.OBSTACLE);
+    grid.addToGrid(22, 13, Grid.OBSTACLE);
+    grid.addToGrid(21, 13, Grid.OBSTACLE);
+    grid.addToGrid(20, 13, Grid.OBSTACLE);
 
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
-
-    gameSpeed = new TimeCounter(50);
 
     score = 0;
     gameState = true;
@@ -63,6 +54,7 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
     gameOverTexture = new Texture("game_over.png");
     scoreFont = new BitmapFont();
 
+    addNewFood();
     Gdx.input.setInputProcessor(this);
     gameController = new GameController();
     gameController.initialize(this);
@@ -78,11 +70,11 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
     batch.begin();
 
     scoreFont.draw(batch, String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
+    grid.render(batch);
 
     if (!gameState)
       batch.draw(gameOverTexture, Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() / 2 - 150, 500, 300);
 
-    grid.render(batch);
     batch.end();
   }
 
@@ -92,27 +84,31 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
     gameOverTexture.dispose();
   }
 
-  private void addNewFood(List<Food> foodList, List<Obstacle> obstacleList, Grid grid) {
-    Random random = new Random();
+  private void addNewFood() {
 
-    int xRandom = -1;
-    int yRandom = -1;
-    do {
-      while (grid.isxOutOfBounds(xRandom))
+    boolean foundPlace = false;
+    
+    SecureRandom random = new SecureRandom();
+    while (!foundPlace) {
+      int xRandom = -1;
+      int yRandom = -1;
+      
+      random = new SecureRandom();
+      while (grid.isxOutOfBounds(xRandom)) {
+        random = new SecureRandom();
         xRandom = random.nextInt(grid.getColumnCount() - 1);
-      while (grid.isyOutOfBounds(yRandom))
+      }
+      while (grid.isyOutOfBounds(yRandom)) {
+        random = new SecureRandom();
         yRandom = random.nextInt(grid.getRowCount() - 1);
+      }
 
-      foodList.add(new Food(xRandom, yRandom));
-    } while (contains(xRandom, yRandom, obstacleList));
-  }
-
-  private boolean contains(int x, int y, List<Obstacle> objectList) {
-
-    for (AObject aObject : objectList)
-      if (x == aObject.getxGridPosition() && y == aObject.getyGridPosition())
-        return true;
-    return false;
+      int randomPlace = grid.getCellValue(xRandom, yRandom);
+      if (randomPlace == Grid.EMPTY) {
+        grid.addToGrid(xRandom, yRandom, Grid.FOOD);
+        foundPlace = true;
+      }
+    }
   }
 
   // InputProcessor
@@ -171,11 +167,10 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     if (event == "Food") {
       snake.grow();
-      System.out.println("COMIO");
       score++;
+      addNewFood();
     } else {
       gameState = false;
-      System.out.println(event);
     }
   }
 

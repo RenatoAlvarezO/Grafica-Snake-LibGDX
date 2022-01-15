@@ -86,20 +86,5 @@ public class GameController {
         notifyCollition("Death");
       }
     }
-    // printList();
-  }
-
-  private void printList() {
-    String[] values = { "RIGHT", "DOWN", "LEFT", "UP" };
-
-    StringBuilder builder = new StringBuilder();
-    builder.append("[");
-    List<Integer> list = game.snake.snakePath;
-    for (Integer value : list) {
-      builder.append(values[value]);
-      builder.append(",");
-    }
-    builder.append("]");
-    System.out.println(builder.toString());
   }
 }

@@ -137,7 +137,6 @@ public class Snake {
     else if (currentDirection == DOWN)
       addToTail(tailPosition.x, tailPosition.y + 1);
 
-    System.out.println(snakePath);
   }
 
   void normalizePosition(Coordinates position) {
