@@ -19,6 +19,7 @@ public class Grid {
   public static final int HEAD = 4;
 
   public int[][] matrixGrid;
+
   private Texture[] textures = {
       null,
       new Texture("apple.png"),
@@ -41,6 +42,14 @@ public class Grid {
     for (int i = 0; i < matrixGrid.length; i++)
       for (int j = 0; j < matrixGrid[0].length; j++)
         matrixGrid[i][j] = 0;
+  }
+
+  public Grid copyGrid() {
+    Grid newGrid = new Grid(columnCount, rowCount);
+    for (int i = 0; i < matrixGrid.length; i++)
+      for (int j = 0; j < matrixGrid[i].length; j++)
+        newGrid.addToGrid(i, j, matrixGrid[i][j]);
+    return newGrid;
   }
 
   public int getCellWidth() {
@@ -149,5 +158,11 @@ public class Grid {
     }
 
     return builder.toString();
+  }
+
+public void copy(Grid originalGrid) {
+    for (int i = 0; i < matrixGrid.length; i++)
+      for (int j = 0; j < matrixGrid[i].length; j++)
+        matrixGrid[i][j] = originalGrid.getCellValue(i, j);
   }
 }

@@ -34,4 +34,8 @@ public class MainGame extends Game {
 
   }
 
+  @Override
+  public void resize(int width, int height) {
+  
+  }
 }

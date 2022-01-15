@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import elc102.ficct.controllers.GameController;
 import elc102.ficct.controllers.GameController.GameProcessor;
@@ -29,13 +30,18 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   Texture gameOverTexture;
   public Grid grid;
 
+  private Grid originalGrid;
+
   public Snake snake;
-  int counter = 0;
 
   GameController gameController;
 
   BitmapFont scoreFont;
+  BitmapFont lifesFont;
+
   int score;
+  int lifes;
+
   boolean gameState;
 
   int snakeDirection = Snake.RIGHT;
@@ -46,8 +52,11 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     this.mainGame = mainGame;
 
     this.grid = grid;
+
+    this.originalGrid = grid.copyGrid();
     batch = new SpriteBatch();
 
+    lifes = 3;
 
     // grid.addToGrid(23, 13, Grid.OBSTACLE);
     // grid.addToGrid(22, 13, Grid.OBSTACLE);
@@ -60,7 +69,10 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     gameState = true;
 
     gameOverTexture = new Texture("game_over.png");
+
     scoreFont = new BitmapFont();
+    lifesFont = new BitmapFont();
+
     grid.addToGrid(20, 11, Grid.FOOD);
     // addNewFood();
     Gdx.input.setInputProcessor(this);
@@ -81,9 +93,12 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     batch.begin();
 
     scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
-    grid.render(batch);
+    lifesFont.draw(batch, "Lifes: " + String.valueOf(lifes), 10, Gdx.graphics.getHeight() - 30);
 
-    if (!gameState)
+    if (gameState)
+      grid.render(batch);
+
+    if (!gameState && lifes == 0)
       batch.draw(gameOverTexture, Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() / 2 - 150, 500, 300);
 
     batch.end();
@@ -91,7 +106,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
   @Override
   public void resize(int width, int height) {
-
+    mainGame.resize(width, height);
   }
 
   @Override
@@ -125,10 +140,15 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
       addNewFood();
     } else {
       gameState = false;
+      lifes--;
     }
 
-    if(!gameState)
-      gameController.stopThread();
+    if (!gameState) {
+      if (lifes <= 0)
+        gameController.stopThread();
+      else
+        restart();
+    }
   }
 
   @Override
@@ -210,5 +230,17 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
         foundPlace = true;
       }
     }
+  }
+
+  private void restart() {
+    grid.copy(originalGrid);
+
+    snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
+    gameState = true;
+    gameController.stopThread();
+    gameController = new GameController();
+    gameController.initialize(this);
+
+    addNewFood();
   }
 }

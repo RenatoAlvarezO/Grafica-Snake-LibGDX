@@ -15,7 +15,6 @@ public class Snake {
   public int currentDirection = RIGHT;
   public int tailDirection = RIGHT;
 
-  public boolean tailCrashed = false;
   Grid grid;
 
   private Coordinates headPosition;
@@ -137,13 +136,13 @@ public class Snake {
     if (currentDirection == RIGHT)
       return addToTail(tailPosition.x - 1, tailPosition.y);
     if (currentDirection == UP)
-      return tailCrashed = addToTail(tailPosition.x, tailPosition.y - 1);
+      return addToTail(tailPosition.x, tailPosition.y - 1);
     if (currentDirection == LEFT)
-      return tailCrashed = addToTail(tailPosition.x + 1, tailPosition.y);
+      return addToTail(tailPosition.x + 1, tailPosition.y);
     if (currentDirection == DOWN)
-      return tailCrashed = addToTail(tailPosition.x, tailPosition.y + 1);
+      return addToTail(tailPosition.x, tailPosition.y + 1);
 
-    return false; 
+    return false;
   }
 
   void normalizePosition(Coordinates position) {
@@ -158,5 +157,17 @@ public class Snake {
 
     if (position.x > grid.getColumnCount() - 1)
       position.x = (0);
+  }
+
+  public void restart(int xGridPosition, int yGridPosition) {
+
+    this.headPosition = new Coordinates(xGridPosition, yGridPosition);
+    this.tailPosition = new Coordinates(xGridPosition - 1, yGridPosition);
+
+    this.snakePath = new LinkedList<Integer>();
+
+    this.snakePath.add(RIGHT);
+    grid.addToGrid(headPosition.x, headPosition.y, Grid.HEAD);
+    grid.addToGrid(tailPosition.x, tailPosition.y, Grid.BODY);
   }
 }
