@@ -2,10 +2,6 @@ package elc102.ficct.utils;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import elc102.ficct.props.Grid;
 
@@ -25,54 +21,35 @@ public class Snake {
   private Coordinates headPosition;
   private Coordinates tailPosition;
 
-  List<Coordinates> snakePath;
+  public List<Integer> snakePath;
 
   public Snake(int xGridPosition, int yGridPosition, Grid grid) {
 
     this.headPosition = new Coordinates(xGridPosition, yGridPosition);
     this.tailPosition = new Coordinates(xGridPosition - 1, yGridPosition);
 
-    this.snakePath = new LinkedList<Coordinates>();
+    this.snakePath = new LinkedList<Integer>();
 
-    this.snakePath.add(headPosition);
-    this.snakePath.add(tailPosition);
+    this.snakePath.add(RIGHT);
 
     this.grid = grid;
     grid.addToGrid(headPosition.x, headPosition.y, Grid.HEAD);
     grid.addToGrid(tailPosition.x, tailPosition.y, Grid.BODY);
   }
 
-  public boolean addToGridPosition(int x, int y) {
-
-    if (grid.isOutOfBounds(this.headPosition.x + x, this.headPosition.y + y))
-      return false;
-
-    // addToHead();
-    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.BODY);
+  public int addToGridPosition(int x, int y) {
+    int previousValue = grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.BODY);
     this.headPosition.x += x;
     this.headPosition.y += y;
-
-    return true;
+    normalizePosition(headPosition);
+    return previousValue;
   }
 
   public void addToTail(int x, int y) {
-    Coordinates previousTail = new Coordinates(this.tailPosition);
     this.tailPosition.setCoordinates(x, y);
-    int previousTailIndex = snakePath.size() - 2;
-    snakePath.add(previousTailIndex, previousTail);
-  }
-
-  public void addToHead() {
-    Coordinates previousHead = new Coordinates(headPosition);
-    snakePath.add(1, previousHead);
-    System.out.println(snakePath.size());
-  }
-
-  public void updateBody() {
-    grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
-    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
-    findNextTailPosition();
-    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
+    normalizePosition(this.tailPosition);
+    int previousValue = snakePath.get(snakePath.size() - 1);
+    snakePath.add(0, previousValue);
   }
 
   public void setCurrentDirection(int newDirection) {
@@ -100,143 +77,53 @@ public class Snake {
   }
 
   private void findNextTailPosition() {
-    if (tailDirection == RIGHT) {
-      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
-        return;
-      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
-        return;
-      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
-        return;
-    }
-    if (tailDirection == UP) {
-      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
-        return;
-      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
-        return;
-      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
-        return;
-    }
-    if (tailDirection == LEFT) {
-      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
-        return;
-      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
-        return;
-      if (testUp(tailPosition, Grid.BODY) || testUp(tailPosition, Grid.HEAD))
-        return;
-    }
 
-    if (tailDirection == DOWN) {
-      if (testDown(tailPosition, Grid.BODY) || testDown(tailPosition, Grid.HEAD))
-        return;
-      if (testRight(tailPosition, Grid.BODY) || testRight(tailPosition, Grid.HEAD))
-        return;
-      if (testLeft(tailPosition, Grid.BODY) || testLeft(tailPosition, Grid.HEAD))
-        return;
-    }
+    int tailNextDirection = snakePath.remove(0);
+    snakePath.add(currentDirection);
 
-    try {
-      throw new Exception("Tail cannot find new position \n\tCurrent Direction=> " + String.valueOf(currentDirection)
-          + "\n\tTail's Direction=> " + String.valueOf(tailDirection) + "\n\tCurrent Position=> "
-          + String.valueOf(tailPosition.x) + " : " + String.valueOf(tailPosition.y));
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (tailNextDirection == RIGHT) {
+      tailPosition.setCoordinates(tailPosition.x + 1, tailPosition.y);
+      normalizePosition(tailPosition);
+    } else if (tailNextDirection == UP) {
+      tailPosition.setCoordinates(tailPosition.x, tailPosition.y + 1);
+      normalizePosition(tailPosition);
+    } else if (tailNextDirection == LEFT) {
+      tailPosition.setCoordinates(tailPosition.x - 1, tailPosition.y);
+      normalizePosition(tailPosition);
+    } else if (tailNextDirection == DOWN) {
+      tailPosition.setCoordinates(tailPosition.x, tailPosition.y - 1);
+      normalizePosition(tailPosition);
+    } else {
+      try {
+        throw new Exception("Tail cannot find new position \n\tCurrent Direction=> " + String.valueOf(currentDirection)
+            + "\n\tTail's Direction=> " + String.valueOf(tailDirection) + "\n\tCurrent Position=> "
+            + String.valueOf(tailPosition.x) + " : " + String.valueOf(tailPosition.y));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
-  private boolean testRight(Coordinates testPosition, int value) {
+  public int updatePosition() {
+    if (currentDirection == UP)
+      this.addToGridPosition(0, 1);
+    else if (currentDirection == DOWN)
+      this.addToGridPosition(0, -1);
+    else if (currentDirection == LEFT)
+      this.addToGridPosition(-1, 0);
+    else if (currentDirection == RIGHT)
+      this.addToGridPosition(1, 0);
 
-    int newPosition = findRight(testPosition, value);
-    if (newPosition >= 0) {
-      tailPosition.x = newPosition;
-      tailDirection = RIGHT;
-      return true;
-    }
-    return false;
+    return updateBody();
   }
 
-  private boolean testUp(Coordinates testPosition, int value) {
-    int newPosition = findUp(testPosition, value);
-    if (newPosition >= 0) {
-      tailPosition.y = newPosition;
-      tailDirection = UP;
-      return true;
-    }
-    return false;
-  }
+  public int updateBody() {
+    int previousValue = grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
+    findNextTailPosition();
+    grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
 
-  private boolean testLeft(Coordinates testPosition, int value) {
-    int newPosition = findLeft(testPosition, value);
-    if (newPosition >= 0) {
-      tailPosition.x = newPosition;
-      tailDirection = LEFT;
-      return true;
-    }
-    return false;
-  }
-
-  private boolean testDown(Coordinates testPosition, int value) {
-    int newPosition = findDown(testPosition, value);
-    if (newPosition >= 0) {
-      tailPosition.y = newPosition;
-      tailDirection = DOWN;
-      return true;
-    }
-    return false;
-  }
-
-  private int findRight(Coordinates testPosition, int value) {
-    int newPosition = testPosition.x + 1;
-    if (grid.isxOutOfBounds(newPosition))
-      newPosition = 0;
-    return grid.getCellValue(newPosition, testPosition.y) == value ? newPosition : -1;
-  }
-
-  private int findLeft(Coordinates testPosition, int value) {
-    int newPosition = testPosition.x - 1;
-    if (grid.isxOutOfBounds(newPosition))
-      newPosition = grid.getColumnCount() - 1;
-    return grid.getCellValue(newPosition, testPosition.y) == value ? newPosition : -1;
-  }
-
-  private int findUp(Coordinates testPosition, int value) {
-    int newPosition = testPosition.y + 1;
-    if (grid.isyOutOfBounds(newPosition))
-      newPosition = 0;
-    return grid.getCellValue(testPosition.x, newPosition) == value ? newPosition : -1;
-  }
-
-  private int findDown(Coordinates testPosition, int value) {
-    int newPosition = testPosition.y - 1;
-    if (grid.isyOutOfBounds(newPosition))
-      newPosition = grid.getRowCount() - 1;
-    return grid.getCellValue(testPosition.x, newPosition) == value ? newPosition : -1;
-  }
-
-  public void updatePosition() {
-    if (currentDirection == UP) {
-      if (headPosition.y > grid.getRowCount() - 1 || !this.addToGridPosition(0, 1))
-        headPosition.y = (0);
-      updateBody();
-      return;
-    }
-    if (currentDirection == DOWN) {
-      if (headPosition.y < 0 || !this.addToGridPosition(0, -1))
-        headPosition.y = (grid.getRowCount() - 1);
-      updateBody();
-      return;
-    }
-    if (currentDirection == LEFT) {
-      if (headPosition.x < 0 || !this.addToGridPosition(-1, 0))
-        headPosition.x = (grid.getColumnCount() - 1);
-      updateBody();
-      return;
-    }
-    if (currentDirection == RIGHT) {
-      if (headPosition.x > grid.getColumnCount() - 1 || !this.addToGridPosition(1, 0))
-        headPosition.x = (0);
-      updateBody();
-    }
-
+    return previousValue;
   }
 
   public void grow() {
@@ -253,4 +140,17 @@ public class Snake {
     System.out.println(snakePath);
   }
 
+  void normalizePosition(Coordinates position) {
+    if (position.y > grid.getRowCount() - 1)
+      position.y = (0);
+
+    if (position.y < 0)
+      position.y = (grid.getRowCount() - 1);
+
+    if (position.x < 0)
+      position.x = (grid.getColumnCount() - 1);
+
+    if (position.x > grid.getColumnCount() - 1)
+      position.x = (0);
+  }
 }

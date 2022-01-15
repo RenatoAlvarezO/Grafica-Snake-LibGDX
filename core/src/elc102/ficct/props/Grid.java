@@ -99,8 +99,12 @@ public class Grid {
   }
 
   public int addToGrid(int column, int row, int type) {
-    
+
+    if (isOutOfBounds(column, row))
+      System.out.println("(" + String.valueOf(column) + "," + String.valueOf(row) + ")");
     int previousValue = matrixGrid[column][row];
+    if(column == 2 && row == 3 && previousValue == FOOD )
+      System.out.println("ACÁ");
     matrixGrid[column][row] = type;
     return previousValue;
   }

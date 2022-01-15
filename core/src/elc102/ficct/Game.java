@@ -48,10 +48,9 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     grid.addToGrid(2, 3, Grid.FOOD);
 
-    grid.addToGrid(2, 3, Grid.FOOD);
     grid.addToGrid(3, 12, Grid.FOOD);
     grid.addToGrid(21, 6, Grid.FOOD);
-    grid.addToGrid(22, 7, Grid.FOOD);
+    grid.addToGrid(22, 9, Grid.FOOD);
     grid.addToGrid(23, 13, Grid.OBSTACLE);
 
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
@@ -172,6 +171,7 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     if (event == "Food") {
       snake.grow();
+      System.out.println("COMIO");
       score++;
     } else {
       gameState = false;
@@ -182,6 +182,5 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   @Override
   public void updateSnake() {
     snake.setCurrentDirection(snakeDirection);
-    snake.updatePosition();
   }
 }

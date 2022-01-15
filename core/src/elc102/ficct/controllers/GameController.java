@@ -64,8 +64,8 @@ public class GameController {
           startTime = System.currentTimeMillis();
 
           if (startTime - lastTime >= updateTime) {
-            checkForCollitions();
             notifyUpdateSnake();
+            checkForCollitions();
             lastTime = startTime;
           }
         }
@@ -76,35 +76,8 @@ public class GameController {
   }
 
   void checkForCollitions() {
-    Coordinates headPosition = game.snake.getHeadPosition();
-    int snakeDirection = game.snake.getDirection();
 
-    int cellValue = Grid.EMPTY;
-
-    if (snakeDirection == Snake.RIGHT) {
-      cellValue = game.grid.getCellValue(headPosition.x + 1, headPosition.y);
-      if (cellValue == Grid.EMPTY)
-        return;
-    }
-
-    if (snakeDirection == Snake.UP) {
-      cellValue = game.grid.getCellValue(headPosition.x, headPosition.y + 1);
-      if (cellValue == Grid.EMPTY)
-        return;
-    }
-
-    if (snakeDirection == Snake.LEFT) {
-      cellValue = game.grid.getCellValue(headPosition.x - 1, headPosition.y);
-      if (cellValue == Grid.EMPTY)
-        return;
-    }
-
-    if (snakeDirection == Snake.DOWN) {
-      cellValue = game.grid.getCellValue(headPosition.x, headPosition.y - 1);
-      if (cellValue == Grid.EMPTY)
-        return;
-    }
-
+    int cellValue = game.snake.updatePosition();
     if (cellValue != Grid.EMPTY) {
       if (cellValue == Grid.FOOD)
         notifyCollition("Food");
@@ -113,5 +86,20 @@ public class GameController {
         notifyCollition("Death");
       }
     }
+    // printList();
+  }
+
+  private void printList() {
+    String[] values = { "RIGHT", "DOWN", "LEFT", "UP" };
+
+    StringBuilder builder = new StringBuilder();
+    builder.append("[");
+    List<Integer> list = game.snake.snakePath;
+    for (Integer value : list) {
+      builder.append(values[value]);
+      builder.append(",");
+    }
+    builder.append("]");
+    System.out.println(builder.toString());
   }
 }
