@@ -17,6 +17,7 @@ public class Snake {
 
   Grid grid;
 
+
   private Coordinates headPosition;
   private Coordinates tailPosition;
 

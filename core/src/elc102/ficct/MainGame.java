@@ -30,12 +30,12 @@ public class MainGame extends Game {
     // grid.addToGrid(0, 10, Grid.OBSTACLE);
     // grid.addToGrid(0, 11, Grid.OBSTACLE);
     // grid.addToGrid(0, 12, Grid.OBSTACLE);
-    setScreen(new GameScreen(this, grid));
+    setScreen(new GameScreen(this, grid, 100));
 
   }
 
   @Override
   public void resize(int width, int height) {
-  
+
   }
 }

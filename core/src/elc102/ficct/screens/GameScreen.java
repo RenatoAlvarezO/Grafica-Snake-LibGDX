@@ -39,6 +39,9 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   BitmapFont scoreFont;
   BitmapFont lifesFont;
 
+  long gameSpeed;
+  long baseSpeed;
+
   int score;
   int lifes;
 
@@ -47,7 +50,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   int snakeDirection = Snake.RIGHT;
   MainGame mainGame;
 
-  public GameScreen(MainGame mainGame, Grid grid) {
+  public GameScreen(MainGame mainGame, Grid grid, long gameSpeed) {
 
     this.mainGame = mainGame;
 
@@ -67,6 +70,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     score = 0;
     gameState = true;
+    this.gameSpeed = gameSpeed;
+    this.baseSpeed = gameSpeed;
 
     gameOverTexture = new Texture("game_over.png");
 
@@ -76,7 +81,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     grid.addToGrid(20, 11, Grid.FOOD);
     // addNewFood();
     Gdx.input.setInputProcessor(this);
-    gameController = new GameController();
+    gameController = new GameController(this.gameSpeed);
     gameController.initialize(this);
   }
 
@@ -137,6 +142,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     if (event == "Food") {
       gameState = snake.grow();
       score++;
+      gameSpeed -= 5;
+      gameController.setSpeed(gameSpeed);
       addNewFood();
     } else {
       gameState = false;
@@ -237,8 +244,9 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
     gameState = true;
+    gameSpeed = baseSpeed;
     gameController.stopThread();
-    gameController = new GameController();
+    gameController = new GameController(baseSpeed);
     gameController.initialize(this);
 
     addNewFood();

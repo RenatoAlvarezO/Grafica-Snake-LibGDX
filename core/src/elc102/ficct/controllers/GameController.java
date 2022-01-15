@@ -12,6 +12,8 @@ public class GameController {
 
   GameScreen game;
 
+  long updateTime;
+
   public interface GameProcessor {
     void onCollition(String event);
 
@@ -21,6 +23,10 @@ public class GameController {
   private final List<GameProcessor> listeners = new ArrayList<>();
 
   private Thread listenerThead;
+
+  public GameController(long speed) {
+    this.updateTime = speed;
+  }
 
   private void notifyListeners(String event) {
     for (GameProcessor gameProcessor : listeners) {
@@ -52,7 +58,7 @@ public class GameController {
     isRunning = true;
     listenerThead = new Thread() {
       long startTime;
-      long updateTime = 50;
+
       long lastTime = startTime;
 
       @Override
@@ -91,4 +97,9 @@ public class GameController {
   public void stopThread() {
     isRunning = false;
   }
+
+  public void setSpeed(long speed){
+    this.updateTime = speed;
+  }
+
 }
