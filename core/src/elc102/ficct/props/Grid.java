@@ -25,9 +25,15 @@ public class Grid {
       new Texture("coin.png"),
       new Texture("rocka01.png"),
       new Texture("body.png"),
-      new Texture("snake.png"),
+      new Texture("snakeR.png"),
   };
 
+  private Texture[] snakeTextures = {
+      new Texture("snakeR.png"),
+      new Texture("snakeD.png"),
+      new Texture("snakeL.png"),
+      new Texture("snakeU.png"),
+  };
   public Grid(int columnCount, int rowCount) {
     this.rowCount = rowCount;
     this.columnCount = columnCount;
@@ -146,6 +152,10 @@ public class Grid {
       }
   }
 
+  public void setSnakeTexture(int direction){
+      textures[4] = snakeTextures[direction];
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -160,7 +170,7 @@ public class Grid {
     return builder.toString();
   }
 
-public void copy(Grid originalGrid) {
+  public void copy(Grid originalGrid) {
     for (int i = 0; i < matrixGrid.length; i++)
       for (int j = 0; j < matrixGrid[i].length; j++)
         matrixGrid[i][j] = originalGrid.getCellValue(i, j);

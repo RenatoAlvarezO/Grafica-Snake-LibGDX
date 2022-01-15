@@ -160,6 +160,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   @Override
   public void updateSnake() {
     snake.setCurrentDirection(snakeDirection);
+    grid.setSnakeTexture(snakeDirection);
   }
 
   // InputProcessor
