@@ -60,11 +60,6 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     lifes = 3;
 
-    // grid.addToGrid(23, 13, Grid.OBSTACLE);
-    // grid.addToGrid(22, 13, Grid.OBSTACLE);
-    // grid.addToGrid(21, 13, Grid.OBSTACLE);
-    // grid.addToGrid(20, 13, Grid.OBSTACLE);
-
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
 
     score = 0;
@@ -77,8 +72,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     scoreFont = new BitmapFont();
     lifesFont = new BitmapFont();
 
-    grid.addToGrid(20, 11, Grid.FOOD);
-    // addNewFood();
+    addNewFood();
     Gdx.input.setInputProcessor(this);
     gameController = new GameController(this.gameSpeed);
     gameController.initialize(this);
@@ -96,7 +90,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     batch.begin();
 
-    // scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10, 200, 2, true);
+    // scoreFont.draw(batch, "Score: " + String.valueOf(score), 10,
+    // Gdx.graphics.getHeight() - 10, 200, 2, true);
     scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
     lifesFont.draw(batch, "Lifes: " + String.valueOf(lifes), 10, Gdx.graphics.getHeight() - 30);
 
@@ -174,6 +169,9 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
       snakeDirection = Snake.RIGHT;
     else if (keycode == (Input.Keys.A))
       snakeDirection = Snake.LEFT;
+    if (!gameState)
+      if (keycode == Input.Keys.ESCAPE)
+        mainGame.setScreen(new StartMenuScreen(mainGame));
     return true;
   }
 
@@ -244,6 +242,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
     gameState = true;
+    snakeDirection = Snake.RIGHT;
     gameSpeed = baseSpeed;
     gameController.stopThread();
     gameController = new GameController(baseSpeed);

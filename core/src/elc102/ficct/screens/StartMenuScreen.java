@@ -191,8 +191,12 @@ public class StartMenuScreen implements Screen, InputProcessor {
     level2.addToGrid(14, 12, Grid.OBSTACLE);
     level2.addToGrid(16, 12, Grid.OBSTACLE);
     level2.addToGrid(22, 2, Grid.OBSTACLE);
-
     level2.addToGrid(22, 1, Grid.OBSTACLE);
+
+    level2.addToGrid(7, 13, Grid.OBSTACLE);
+    level2.addToGrid(8, 13, Grid.OBSTACLE);
+    level2.addToGrid(9, 13, Grid.OBSTACLE);
+    level2.addToGrid(10, 13, Grid.OBSTACLE);
 
     speeds.add(90l);
 
@@ -223,6 +227,12 @@ public class StartMenuScreen implements Screen, InputProcessor {
     level3.addToGrid(31, 13, Grid.OBSTACLE);
     level3.addToGrid(31, 14, Grid.OBSTACLE);
     level3.addToGrid(31, 15, Grid.OBSTACLE);
+
+    level3.addToGrid(14, 13, Grid.OBSTACLE);
+    level3.addToGrid(15, 13, Grid.OBSTACLE);
+    level3.addToGrid(16, 13, Grid.OBSTACLE);
+    level3.addToGrid(17, 13, Grid.OBSTACLE);
+
     speeds.add(85l);
 
     levels.add(level1);
