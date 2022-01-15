@@ -27,6 +27,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
   SpriteBatch batch;
   Texture gameOverTexture;
+
+  Texture background;
   public Grid grid;
 
   private Grid originalGrid;
@@ -54,6 +56,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     this.mainGame = mainGame;
 
     this.grid = grid;
+
+    background = new Texture("background.png");
 
     this.originalGrid = grid.copyGrid();
     batch = new SpriteBatch();
@@ -86,12 +90,12 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   @Override
   public void render(float delta) {
 
-    ScreenUtils.clear(Color.TEAL);
+    ScreenUtils.clear(Color.GRAY);
 
     batch.begin();
 
-    // scoreFont.draw(batch, "Score: " + String.valueOf(score), 10,
-    // Gdx.graphics.getHeight() - 10, 200, 2, true);
+    batch.draw(background, 0, 0);
+
     scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
     lifesFont.draw(batch, "Lifes: " + String.valueOf(lifes), 10, Gdx.graphics.getHeight() - 30);
 
@@ -238,13 +242,16 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
   }
 
   private void restart() {
-    grid.copy(originalGrid);
-
-    snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
-    gameState = true;
-    snakeDirection = Snake.RIGHT;
-    gameSpeed = baseSpeed;
     gameController.stopThread();
+
+    grid.copy(originalGrid);
+    snakeDirection = Snake.RIGHT;
+    snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
+     
+    gameState = true;
+
+    gameSpeed = baseSpeed;
+     
     gameController = new GameController(baseSpeed);
     gameController.initialize(this);
 

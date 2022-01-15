@@ -74,7 +74,7 @@ public class GameController {
             checkForCollitions();
             lastTime = startTime;
           }
-        }
+       }
       }
     };
 

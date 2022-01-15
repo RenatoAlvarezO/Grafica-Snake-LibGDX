@@ -22,8 +22,8 @@ public class Grid {
 
   private Texture[] textures = {
       null,
-      new Texture("apple.png"),
-      new Texture("gray.png"),
+      new Texture("coin.png"),
+      new Texture("rocka01.png"),
       new Texture("body.png"),
       new Texture("snake.png"),
   };
