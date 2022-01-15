@@ -39,9 +39,14 @@ public class Snake {
 
   public int addToGridPosition(int x, int y) {
     int previousValue = grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.BODY);
+    if(grid.isOutOfBounds(this.headPosition.x + x, this.headPosition.y + y))
+       return Grid.OBSTACLE;
+    
     this.headPosition.x += x;
     this.headPosition.y += y;
-    normalizePosition(headPosition);
+
+    
+    // normalizePosition(headPosition);
     return previousValue;
   }
 

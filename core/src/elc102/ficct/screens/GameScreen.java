@@ -174,9 +174,8 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
       snakeDirection = Snake.RIGHT;
     else if (keycode == (Input.Keys.A))
       snakeDirection = Snake.LEFT;
-    if (!gameState)
-      if (keycode == Input.Keys.ESCAPE)
-        mainGame.setScreen(new StartMenuScreen(mainGame));
+    if (keycode == Input.Keys.ESCAPE)
+      mainGame.setScreen(new StartMenuScreen(mainGame));
     return true;
   }
 
@@ -248,11 +247,11 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
     grid.copy(originalGrid);
     snakeDirection = Snake.RIGHT;
     snake.restart(grid.getColumnCount() / 2, grid.getRowCount() / 2);
-     
+
     gameState = true;
 
     gameSpeed = baseSpeed;
-     
+
     gameController = new GameController(baseSpeed);
     gameController.initialize(this);
 
