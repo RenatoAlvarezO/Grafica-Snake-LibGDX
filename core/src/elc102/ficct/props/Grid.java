@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import elc102.ficct.utils.Coordinates;
+
 public class Grid {
   private int cellWidth;
   private int cellHeight;
@@ -103,6 +105,27 @@ public class Grid {
     int previousValue = matrixGrid[column][row];
     matrixGrid[column][row] = type;
     return previousValue;
+  }
+
+  void normalize(Coordinates position) {
+
+    if (position.y > getRowCount() - 1)
+      position.y = (0);
+
+    if (position.y < 0)
+      position.y = (getRowCount() - 1);
+
+    if (position.x < 0)
+      position.x = (getColumnCount() - 1);
+
+    if (position.x > getColumnCount() - 1)
+      position.x = (0);
+  }
+
+  public boolean isAvailable(int x, int y) {
+    Coordinates coordinates = new Coordinates(x, y);
+    normalize(coordinates);
+    return matrixGrid[coordinates.x][coordinates.y] == Grid.EMPTY;
   }
 
   public void render(SpriteBatch batch) {

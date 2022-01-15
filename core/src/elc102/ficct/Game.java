@@ -53,8 +53,8 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     gameOverTexture = new Texture("game_over.png");
     scoreFont = new BitmapFont();
-
-    addNewFood();
+    grid.addToGrid(20, 11, Grid.FOOD);
+    // addNewFood();
     Gdx.input.setInputProcessor(this);
     gameController = new GameController();
     gameController.initialize(this);
@@ -69,7 +69,7 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
 
     batch.begin();
 
-    scoreFont.draw(batch, String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
+    scoreFont.draw(batch,"Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
     grid.render(batch);
 
     if (!gameState)
