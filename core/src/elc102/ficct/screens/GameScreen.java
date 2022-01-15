@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 import elc102.ficct.controllers.GameController;
 import elc102.ficct.controllers.GameController.GameProcessor;
@@ -97,6 +96,7 @@ public class GameScreen implements Screen, InputProcessor, GameProcessor {
 
     batch.begin();
 
+    // scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10, 200, 2, true);
     scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
     lifesFont.draw(batch, "Lifes: " + String.valueOf(lifes), 10, Gdx.graphics.getHeight() - 30);
 
