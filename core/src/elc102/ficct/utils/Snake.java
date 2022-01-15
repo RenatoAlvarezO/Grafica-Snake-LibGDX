@@ -15,7 +15,7 @@ public class Snake {
   public int currentDirection = RIGHT;
   public int tailDirection = RIGHT;
 
-  public int tailAvoidDirection = LEFT;
+  public boolean tailCrashed = false;
   Grid grid;
 
   private Coordinates headPosition;
@@ -45,11 +45,16 @@ public class Snake {
     return previousValue;
   }
 
-  public void addToTail(int x, int y) {
+  public boolean addToTail(int x, int y) {
+    if (grid.getCellValue(x, y) == Grid.OBSTACLE) {
+      System.out.println("HEY1");
+      return false;
+    }
     this.tailPosition.setCoordinates(x, y);
     normalizePosition(this.tailPosition);
     int previousValue = snakePath.get(snakePath.size() - 1);
     snakePath.add(0, previousValue);
+    return true;
   }
 
   public void setCurrentDirection(int newDirection) {
@@ -121,22 +126,24 @@ public class Snake {
     int previousValue = grid.addToGrid(this.headPosition.x, this.headPosition.y, Grid.HEAD);
     grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.EMPTY);
     findNextTailPosition();
+
     grid.addToGrid(this.tailPosition.x, this.tailPosition.y, Grid.BODY);
 
     return previousValue;
   }
 
-  public void grow() {
+  public boolean grow() {
 
     if (currentDirection == RIGHT)
-      addToTail(tailPosition.x - 1, tailPosition.y);
-    else if (currentDirection == UP)
-      addToTail(tailPosition.x, tailPosition.y - 1);
-    else if (currentDirection == LEFT)
-      addToTail(tailPosition.x + 1, tailPosition.y);
-    else if (currentDirection == DOWN)
-      addToTail(tailPosition.x, tailPosition.y + 1);
+      return addToTail(tailPosition.x - 1, tailPosition.y);
+    if (currentDirection == UP)
+      return tailCrashed = addToTail(tailPosition.x, tailPosition.y - 1);
+    if (currentDirection == LEFT)
+      return tailCrashed = addToTail(tailPosition.x + 1, tailPosition.y);
+    if (currentDirection == DOWN)
+      return tailCrashed = addToTail(tailPosition.x, tailPosition.y + 1);
 
+    return false; 
   }
 
   void normalizePosition(Coordinates position) {

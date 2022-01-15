@@ -3,16 +3,14 @@ package elc102.ficct.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import elc102.ficct.Game;
 import elc102.ficct.props.Grid;
-import elc102.ficct.utils.Coordinates;
-import elc102.ficct.utils.Snake;
+import elc102.ficct.screens.GameScreen;
 
 public class GameController {
 
   private boolean isRunning = false;
 
-  Game game;
+  GameScreen game;
 
   public interface GameProcessor {
     void onCollition(String event);
@@ -21,6 +19,8 @@ public class GameController {
   }
 
   private final List<GameProcessor> listeners = new ArrayList<>();
+
+  private Thread listenerThead;
 
   private void notifyListeners(String event) {
     for (GameProcessor gameProcessor : listeners) {
@@ -43,14 +43,14 @@ public class GameController {
     listeners.add(listener);
   }
 
-  public void initialize(Game game) {
-    this.isRunning = true;
+  public void initialize(GameScreen game) {
 
     this.game = game;
 
     addListentener(this.game);
 
-    Thread listenerThead = new Thread() {
+    isRunning = true;
+    listenerThead = new Thread() {
       long startTime;
       long updateTime = 50;
       long lastTime = startTime;
@@ -79,12 +79,16 @@ public class GameController {
 
     int cellValue = game.snake.updatePosition();
     if (cellValue != Grid.EMPTY) {
-      if (cellValue == Grid.FOOD)
+      if (cellValue == Grid.FOOD) {
         notifyCollition("Food");
-      else {
-        isRunning = false;
+      } else {
+        stopThread();
         notifyCollition("Death");
       }
     }
+  }
+
+  public void stopThread() {
+    isRunning = false;
   }
 }

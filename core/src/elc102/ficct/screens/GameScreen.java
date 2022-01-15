@@ -1,10 +1,11 @@
-package elc102.ficct;
+package elc102.ficct.screens;
+
+import com.badlogic.gdx.Screen;
+
+import elc102.ficct.MainGame;
 
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Random;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -19,7 +20,11 @@ import elc102.ficct.controllers.GameController.GameProcessor;
 import elc102.ficct.props.Grid;
 import elc102.ficct.utils.Snake;
 
-public class Game extends ApplicationAdapter implements InputProcessor, GameProcessor {
+/**
+ * GameScreen
+ */
+public class GameScreen implements Screen, InputProcessor, GameProcessor {
+
   SpriteBatch batch;
   Texture gameOverTexture;
   public Grid grid;
@@ -34,17 +39,20 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   boolean gameState;
 
   int snakeDirection = Snake.RIGHT;
+  MainGame mainGame;
 
-  @Override
-  public void create() {
+  public GameScreen(MainGame mainGame, Grid grid) {
+
+    this.mainGame = mainGame;
+
+    this.grid = grid;
     batch = new SpriteBatch();
 
-    grid = new Grid(16 * 2, 9 * 2);
 
-    grid.addToGrid(23, 13, Grid.OBSTACLE);
-    grid.addToGrid(22, 13, Grid.OBSTACLE);
-    grid.addToGrid(21, 13, Grid.OBSTACLE);
-    grid.addToGrid(20, 13, Grid.OBSTACLE);
+    // grid.addToGrid(23, 13, Grid.OBSTACLE);
+    // grid.addToGrid(22, 13, Grid.OBSTACLE);
+    // grid.addToGrid(21, 13, Grid.OBSTACLE);
+    // grid.addToGrid(20, 13, Grid.OBSTACLE);
 
     snake = new Snake(grid.getColumnCount() / 2, grid.getRowCount() / 2, grid);
 
@@ -58,18 +66,21 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
     Gdx.input.setInputProcessor(this);
     gameController = new GameController();
     gameController.initialize(this);
+  }
+
+  @Override
+  public void show() {
 
   }
 
-  // LibGDX
   @Override
-  public void render() {
+  public void render(float delta) {
 
     ScreenUtils.clear(Color.TEAL);
 
     batch.begin();
 
-    scoreFont.draw(batch,"Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
+    scoreFont.draw(batch, "Score: " + String.valueOf(score), 10, Gdx.graphics.getHeight() - 10);
     grid.render(batch);
 
     if (!gameState)
@@ -79,42 +90,55 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
   }
 
   @Override
+  public void resize(int width, int height) {
+
+  }
+
+  @Override
+  public void pause() {
+
+  }
+
+  @Override
+  public void resume() {
+
+  }
+
+  @Override
+  public void hide() {
+
+  }
+
+  @Override
   public void dispose() {
+
     batch.dispose();
     gameOverTexture.dispose();
   }
 
-  private void addNewFood() {
+  @Override
+  public void onCollition(String event) {
 
-    boolean foundPlace = false;
-    
-    SecureRandom random = new SecureRandom();
-    while (!foundPlace) {
-      int xRandom = -1;
-      int yRandom = -1;
-      
-      random = new SecureRandom();
-      while (grid.isxOutOfBounds(xRandom)) {
-        random = new SecureRandom();
-        xRandom = random.nextInt(grid.getColumnCount() - 1);
-      }
-      while (grid.isyOutOfBounds(yRandom)) {
-        random = new SecureRandom();
-        yRandom = random.nextInt(grid.getRowCount() - 1);
-      }
-
-      int randomPlace = grid.getCellValue(xRandom, yRandom);
-      if (randomPlace == Grid.EMPTY) {
-        grid.addToGrid(xRandom, yRandom, Grid.FOOD);
-        foundPlace = true;
-      }
+    if (event == "Food") {
+      gameState = snake.grow();
+      score++;
+      addNewFood();
+    } else {
+      gameState = false;
     }
+
+    if(!gameState)
+      gameController.stopThread();
+  }
+
+  @Override
+  public void updateSnake() {
+    snake.setCurrentDirection(snakeDirection);
   }
 
   // InputProcessor
   @Override
   public boolean keyDown(int keycode) {
-
     if (keycode == (Input.Keys.W))
       snakeDirection = Snake.UP;
     else if (keycode == (Input.Keys.S))
@@ -161,21 +185,30 @@ public class Game extends ApplicationAdapter implements InputProcessor, GameProc
     return false;
   }
 
-  // GameController
-  @Override
-  public void onCollition(String event) {
+  private void addNewFood() {
 
-    if (event == "Food") {
-      snake.grow();
-      score++;
-      addNewFood();
-    } else {
-      gameState = false;
+    boolean foundPlace = false;
+
+    SecureRandom random = new SecureRandom();
+    while (!foundPlace) {
+      int xRandom = -1;
+      int yRandom = -1;
+
+      random = new SecureRandom();
+      while (grid.isxOutOfBounds(xRandom)) {
+        random = new SecureRandom();
+        xRandom = random.nextInt(grid.getColumnCount() - 1);
+      }
+      while (grid.isyOutOfBounds(yRandom)) {
+        random = new SecureRandom();
+        yRandom = random.nextInt(grid.getRowCount() - 1);
+      }
+
+      int randomPlace = grid.getCellValue(xRandom, yRandom);
+      if (randomPlace == Grid.EMPTY) {
+        grid.addToGrid(xRandom, yRandom, Grid.FOOD);
+        foundPlace = true;
+      }
     }
-  }
-
-  @Override
-  public void updateSnake() {
-    snake.setCurrentDirection(snakeDirection);
   }
 }
